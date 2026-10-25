@@ -3,11 +3,13 @@ package io.levendel.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 
 import io.levendel.CityGenerator;
-
+import io.levendel.Utility.Elevation;
+import io.levendel.Utility.ElevationProvider;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.commands.synchronization.brigadier.IntegerArgumentInfo;
 import net.minecraft.core.BlockPos;
+import net.minecraft.data.worldgen.TerrainProvider;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -27,12 +29,14 @@ public class GenerateCity {
                                 .then(Commands.argument("y1", IntegerArgumentType.integer())
                                         .then(Commands.argument("y2", IntegerArgumentType.integer())
                                                 .executes(context -> {
+                                                    Level level = context.getSource().getLevel();
+
                                                     // Level level = context.getSource().getLevel();
 
-                                                    // BlockPos pos1 = BlockPosArgument.getLoadedBlockPos(context,
-                                                    // "pos1");
-                                                    // BlockPos pos2 = BlockPosArgument.getLoadedBlockPos(context,
-                                                    // "pos2");
+                                                    BlockPos pos1 = BlockPosArgument.getLoadedBlockPos(context,
+                                                            "pos1");
+                                                    BlockPos pos2 = BlockPosArgument.getLoadedBlockPos(context,
+                                                            "pos2");
 
                                                     // int minX = Math.min(pos1.getX(), pos2.getX());
                                                     // int minY = Math.min(pos1.getY(), pos2.getY());
@@ -48,8 +52,13 @@ public class GenerateCity {
                                                     // level.setBlock(pos, Blocks.ACACIA_PLANKS.defaultBlockState(), 3);
                                                     // }
                                                     // }
-
-                                                    return 1;
+                                                    return generateCity(level, pos1, pos2);
                                                 })))));
+    }
+
+    public static int generateCity(Level level, BlockPos pos1, BlockPos pos2) {
+        Elevation ev = ElevationProvider.provide(level, pos1, pos2);
+
+        return 1;
     }
 }
