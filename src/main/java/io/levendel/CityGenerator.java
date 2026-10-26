@@ -2,7 +2,6 @@ package io.levendel;
 
 import com.mojang.logging.LogUtils;
 
-import io.levendel.Command.GenerateCity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.food.FoodProperties;
