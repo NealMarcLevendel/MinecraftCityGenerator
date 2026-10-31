@@ -93,9 +93,9 @@ public class GenerateCity {
         public static int generateCity(Level level, BlockPos pos1, BlockPos pos2) {
                 Elevation ev = ElevationProvider.provide(level, pos1, pos2);
 
-                AttractionField af = new AttractionField(ev);
+                // AttractionField af = new AttractionField(ev);
 
-                //StreetGrower rg = new StreetGrower(ev, 10);
+                // StreetGrower rg = new StreetGrower(ev, 10);
 
                 return 1;
         }

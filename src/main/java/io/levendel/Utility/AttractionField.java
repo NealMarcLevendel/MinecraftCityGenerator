@@ -1,17 +1,27 @@
 package io.levendel.Utility;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 public class AttractionField {
-    private Map<Tile, Set<Tile>> connections = new HashMap<>();
-    
     public Elevation ev;
-    public List<Tile> tiles = new ArrayList<>();
-    public AttractionField (Elevation ev, int tileSize) {
+
+    public int tileRadius;
+    public int blurRadius;
+    public double sigma;
+
+    private double[][] elevation;
+    private double[][] smoothed;
+    private double[][] slope;
+    private double[][] accessibility;
+
+    public AttractionField(
+            Elevation ev,
+            int tileRadius,
+            int blurRadius,
+            double sigma) {
         this.ev = ev;
+        this.tileRadius = tileRadius;
+        this.blurRadius = blurRadius;
+        this.sigma = sigma;
+
+        this.elevation = ev.toArray();
     }
 }

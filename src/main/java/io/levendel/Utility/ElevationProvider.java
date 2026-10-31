@@ -10,13 +10,18 @@ public class ElevationProvider {
         int maxX = Math.max(pos1.getX(), pos2.getX());
         int maxZ = Math.max(pos1.getZ(), pos2.getZ());
 
-        Elevation ev = new Elevation(new ElevationPoint(minX, minZ), new ElevationPoint(maxX, maxZ));
+        Elevation ev = new Elevation(
+                new ElevationPoint(minX, minZ),
+                new ElevationPoint(maxX, maxZ));
 
         for (int x = minX; x <= maxX; x++) {
-            for (int z = minZ; z < maxZ; z++) {
-                for (int y = level.getMaxBuildHeight(); y >= level.getMinBuildHeight(); y--) {
+            for (int z = minZ; z <= maxZ; z++) {
+
+                for (int y = level.getMaxBuildHeight() - 1; y >= level.getMinBuildHeight(); y--) {
+
                     if (!level.getBlockState(new BlockPos(x, y, z)).isAir()) {
                         ev.set(new ElevationPoint(x, z), y);
+                        break;
                     }
                 }
             }

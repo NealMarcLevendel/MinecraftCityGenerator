@@ -7,8 +7,7 @@ import java.util.Set;
 public class StreetGrower {
     private Elevation ev;
     private AttractionField af;
-    private Agent [] agents;
-    
+    private Agent[] agents;
 
     public StreetGrower(Elevation ev, AttractionField af, int numAgents) {
         this.ev = ev;
@@ -18,8 +17,8 @@ public class StreetGrower {
 
     public StreetMap grow() {
         StreetMap sm = new StreetMap();
-        //logic
-        
+        // logic
+
         //
         return sm;
     }
@@ -30,8 +29,8 @@ public class StreetGrower {
         public Agent(StreetNode head, AttractionField af) {
             this.head = head;
         }
-        public StreetNode decide () {
-            
+
+        public StreetNode decide() {
 
             return this.head;
         }
