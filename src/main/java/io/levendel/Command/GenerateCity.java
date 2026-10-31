@@ -3,6 +3,7 @@ package io.levendel.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 
 import io.levendel.CityGenerator;
+import io.levendel.Utility.AttractionField;
 import io.levendel.Utility.Elevation;
 import io.levendel.Utility.ElevationProvider;
 import io.levendel.Utility.StreetGrower;
@@ -92,7 +93,9 @@ public class GenerateCity {
         public static int generateCity(Level level, BlockPos pos1, BlockPos pos2) {
                 Elevation ev = ElevationProvider.provide(level, pos1, pos2);
 
-                StreetGrower rg = new StreetGrower(ev, 10);
+                AttractionField af = new AttractionField(ev);
+
+                //StreetGrower rg = new StreetGrower(ev, 10);
 
                 return 1;
         }

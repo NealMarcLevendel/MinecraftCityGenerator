@@ -5,12 +5,12 @@ import net.minecraft.world.level.Level;
 
 public class ElevationProvider {
     public static Elevation provide(Level level, BlockPos pos1, BlockPos pos2) {
-        Elevation ev = new Elevation();
-
         int minX = Math.min(pos1.getX(), pos2.getX());
         int minZ = Math.min(pos1.getZ(), pos2.getZ());
         int maxX = Math.max(pos1.getX(), pos2.getX());
         int maxZ = Math.max(pos1.getZ(), pos2.getZ());
+
+        Elevation ev = new Elevation(new ElevationPoint(minX, minZ), new ElevationPoint(maxX, maxZ));
 
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z < maxZ; z++) {
@@ -23,6 +23,5 @@ public class ElevationProvider {
         }
 
         return ev;
-
     }
 }
