@@ -27,6 +27,7 @@ public class StreetGrower {
         public StreetNode head;
 
         public Agent(StreetNode head, AttractionField af) {
+
             this.head = head;
         }
 

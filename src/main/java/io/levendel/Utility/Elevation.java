@@ -5,8 +5,8 @@ import java.util.Map;
 
 public class Elevation {
     private Map<ElevationPoint, Integer> ElevationMap = new HashMap<>();
-    public ElevationPoint bound1;
-    public ElevationPoint bound2;
+    public final ElevationPoint bound1;
+    public final ElevationPoint bound2;
 
     public Elevation(ElevationPoint bound1, ElevationPoint bound2) {
         int minX = Math.min(bound1.x(), bound2.x());

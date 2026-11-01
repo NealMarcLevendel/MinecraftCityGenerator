@@ -16,14 +16,17 @@ public class ElevationProvider {
 
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
+                int elevation = level.getMinBuildHeight();
 
                 for (int y = level.getMaxBuildHeight() - 1; y >= level.getMinBuildHeight(); y--) {
 
                     if (!level.getBlockState(new BlockPos(x, y, z)).isAir()) {
-                        ev.set(new ElevationPoint(x, z), y);
+                        elevation = y;
                         break;
                     }
                 }
+
+                ev.set(new ElevationPoint(x, z), elevation);
             }
         }
 
