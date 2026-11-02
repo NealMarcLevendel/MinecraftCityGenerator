@@ -1,4 +1,4 @@
-package io.levendel.Utility;
+package io.levendel.Core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,11 +7,11 @@ import java.util.Set;
 
 public class StreetGrower {
     private Elevation ev;
-    private AttractionField af;
+    private StreetAttractor af;
     private Agent[] agents;
     private Map<StreetNode, Set<StreetNode>> streetNodeConnections = new HashMap<>();
 
-    public StreetGrower(Elevation ev, AttractionField af, int numAgents) {
+    public StreetGrower(Elevation ev, StreetAttractor af, int numAgents) {
         this.ev = ev;
         this.af = af;
         this.agents = new Agent[numAgents];
@@ -41,12 +41,12 @@ public class StreetGrower {
     public static class Agent {
         public StreetNode head;
 
-        public Agent(StreetNode head, AttractionField af) {
+        public Agent(StreetNode head, StreetAttractor af) {
 
             this.head = head;
         }
 
-        public StreetNode decide() {
+        public StreetNode propose() {
 
             return this.head;
         }

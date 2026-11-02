@@ -1,4 +1,4 @@
-package io.levendel.Utility;
+package io.levendel.Core;
 
 public record StreetNode(double x, double z) {
 }

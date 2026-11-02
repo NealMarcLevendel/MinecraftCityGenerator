@@ -1,4 +1,4 @@
-package io.levendel.Utility;
+package io.levendel.Core;
 
 import java.util.HashMap;
 import java.util.Map;

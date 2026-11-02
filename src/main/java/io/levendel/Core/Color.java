@@ -1,4 +1,4 @@
-package io.levendel.Utility;
+package io.levendel.Core;
 
 import java.io.IOException;
 import java.util.Objects;
