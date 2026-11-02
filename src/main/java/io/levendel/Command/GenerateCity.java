@@ -12,7 +12,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import io.levendel.CityGenerator;
 import io.levendel.Utility.AttractionField;
 import io.levendel.Utility.Elevation;
-import io.levendel.Utility.ElevationPoint;
+import io.levendel.Utility.Point;
 import io.levendel.Utility.ElevationProvider;
 import io.levendel.Utility.StreetGrower;
 import io.levendel.Utility.Color;
@@ -65,32 +65,26 @@ public class GenerateCity {
         public static int generateCity(Level level, BlockPos pos1, BlockPos pos2) {
                 Elevation ev = ElevationProvider.provide(level, pos1, pos2);
 
-                AttractionField af = new AttractionField(ev, 3, level.getMaxBuildHeight(), level.getMinBuildHeight());
+                AttractionField af = new AttractionField(ev, 1, level.getMaxBuildHeight(), level.getMinBuildHeight());
 
-                BufferedImage bi = new BufferedImage(
-                                ev.bound2.x() - ev.bound1.x() + 1,
-                                ev.bound2.z() - ev.bound1.z() + 1,
-                                BufferedImage.TYPE_INT_ARGB);
+                BufferedImage bi = new BufferedImage(ev.getWidth(), ev.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
-                for (int x = ev.bound1.x(); x <= ev.bound2.x(); x++) {
-                        for (int z = ev.bound1.z(); z <= ev.bound2.z(); z++) {
-                                double cost = af.get(new ElevationPoint(x, z));
+                for (int z = 0; z < ev.getHeight(); z++) {
+                        for (int x = 0; x < ev.getWidth(); x++) {
+
+                                double cost = af.get(new Point(x, z));
 
                                 int grayscale = (int) (cost * 255);
+                                grayscale = Math.max(0, Math.min(255, grayscale));
 
-                                if (grayscale <= 360) {
-                                        bi.setRGB(x - ev.bound1.x(), z - ev.bound1.z(),
-                                                        new Color(255, grayscale, grayscale, grayscale).toInteger());
-                                }
-                                System.out.println("Grayscale at " + x + ", " + z + ": " + grayscale);
+                                bi.setRGB(
+                                                x,
+                                                z,
+                                                new Color(255, grayscale, grayscale, grayscale).toInteger());
                         }
                 }
 
-                File output = new File("el.png");/*
-                                                  * new File(
-                                                  * Minecraft.getInstance().gameDirectory,
-                                                  * "el.png");
-                                                  */
+                File output = new File("el.png");
 
                 try {
                         ImageIO.write(bi, "png", output);

@@ -10,9 +10,7 @@ public class ElevationProvider {
         int maxX = Math.max(pos1.getX(), pos2.getX());
         int maxZ = Math.max(pos1.getZ(), pos2.getZ());
 
-        Elevation ev = new Elevation(
-                new ElevationPoint(minX, minZ),
-                new ElevationPoint(maxX, maxZ));
+        Elevation ev = new Elevation(minX, minZ, maxX, maxZ);
 
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
@@ -26,7 +24,7 @@ public class ElevationProvider {
                     }
                 }
 
-                ev.set(new ElevationPoint(x, z), elevation);
+                ev.setWithOffset(x, z, elevation);
             }
         }
 

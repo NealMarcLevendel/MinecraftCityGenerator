@@ -1,61 +1,107 @@
 package io.levendel.Utility;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class AttractionField {
-    public Elevation elevation;
-    public int tileRadius;
-    public int max;
-    public int min;
-    private Map<ElevationPoint, Double> af = new HashMap<>();
 
-    public AttractionField(Elevation elevation, int tileRadius, int verticalBound1, int verticalBound2) {
+    private final double[][] data;
+
+    private final int offsetX;
+    private final int offsetZ;
+
+    private final int tileRadius;
+    private final int max;
+    private final int min;
+
+    public AttractionField(
+            Elevation elevation,
+            int tileRadius,
+            int verticalBound1,
+            int verticalBound2) {
+
+        if (tileRadius < 0) {
+            throw new IllegalArgumentException("Tile radius cannot be negative.");
+        }
+
         this.tileRadius = tileRadius;
-        this.elevation = elevation;
         this.max = Math.max(verticalBound1, verticalBound2);
         this.min = Math.min(verticalBound1, verticalBound2);
 
-        for (int x = elevation.bound1.x(); x <= elevation.bound2.x(); x++) {
-            for (int z = elevation.bound1.z(); z <= elevation.bound2.z(); z++) {
-                List<Integer> tile = new ArrayList<>();
-                af.put(new ElevationPoint(x, z), getHeightDifferenceMagnitude(tile, x, z));
+        this.offsetX = elevation.offsetX;
+        this.offsetZ = elevation.offsetZ;
+
+        data = new double[elevation.getHeight()][elevation.getWidth()];
+
+        for (int z = 0; z < data.length; z++) {
+            for (int x = 0; x < data[z].length; x++) {
+                data[z][x] = getHeightDifferenceMagnitude(elevation, x, z);
             }
         }
     }
 
-    private double getHeightDifferenceMagnitude(List<Integer> tile, int x, int z) {
-        for (int xr = x - tileRadius; xr <= x + tileRadius; xr++) {
-            for (int zr = z - tileRadius; zr <= z + tileRadius; zr++) {
-                if (xr < elevation.bound1.x() || xr > elevation.bound2.x())
-                    continue;
-                if (zr < elevation.bound1.z() || zr > elevation.bound2.z())
-                    continue;
-
-                Integer height = elevation.get(new ElevationPoint(xr, zr));
-                if (height != null)
-                    tile.add(height);
-            }
-        }
+    private double getHeightDifferenceMagnitude(
+            Elevation elevation, int x, int z) {
 
         int top = Integer.MIN_VALUE;
         int bottom = Integer.MAX_VALUE;
-        for (Integer i : tile) {
-            top = Math.max(top, i);
-            bottom = Math.min(bottom, i);
+
+        for (int xr = x - tileRadius; xr <= x + tileRadius; xr++) {
+            for (int zr = z - tileRadius; zr <= z + tileRadius; zr++) {
+
+                if (xr < 0 || xr >= elevation.getWidth())
+                    continue;
+
+                if (zr < 0 || zr >= elevation.getHeight())
+                    continue;
+
+                int height = elevation.get(xr, zr);
+
+                top = Math.max(top, height);
+                bottom = Math.min(bottom, height);
+            }
         }
+
         int value = top - bottom;
 
-        if (this.max == this.min)
+        if (max == min)
             return 0.0;
-        return (double) (value - this.min) / (this.max - this.min);
+
+        return Math.max(0.0, Math.min(1.0,
+                (double) (value - min) / (max - min)));
     }
 
-    public Double get(ElevationPoint ep) {
-        if (!af.containsKey(ep))
-            return null;
-        return af.get(ep);
+    // Array-relative coordinates
+
+    public double get(int x, int z) {
+        checkBounds(x, z);
+        return data[z][x];
+    }
+
+    public void set(int x, int z, double value) {
+        checkBounds(x, z);
+        data[z][x] = value;
+    }
+
+    // World coordinates
+
+    public double getWithOffset(int x, int z) {
+        return get(x - offsetX, z - offsetZ);
+    }
+
+    public void setWithOffset(int x, int z, double value) {
+        set(x - offsetX, z - offsetZ, value);
+    }
+
+    public int getWidth() {
+        return data[0].length;
+    }
+
+    public int getHeight() {
+        return data.length;
+    }
+
+    private void checkBounds(int x, int z) {
+        if (x < 0 || x >= getWidth() || z < 0 || z >= getHeight()) {
+            throw new IndexOutOfBoundsException(
+                    "Coordinates out of bounds: (" + x + ", " + z + ")");
+        }
     }
 }
