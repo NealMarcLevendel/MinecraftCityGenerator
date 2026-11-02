@@ -5,15 +5,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import java.util.List;
+
 public class StreetGrower {
     private Elevation ev;
-    private StreetAttractor af;
+    private List<StreetAttractor> streetAttractors;
     private Agent[] agents;
     private Map<StreetNode, Set<StreetNode>> streetNodeConnections = new HashMap<>();
 
-    public StreetGrower(Elevation ev, StreetAttractor af, int numAgents) {
+    public StreetGrower(Elevation ev, List<StreetAttractor> streetAttractors, int numAgents) {
         this.ev = ev;
-        this.af = af;
+        this.streetAttractors = streetAttractors;
         this.agents = new Agent[numAgents];
     }
 
@@ -48,7 +50,7 @@ public class StreetGrower {
 
         public StreetNode propose() {
 
-            return this.head;
+            return null;
         }
     }
 }
