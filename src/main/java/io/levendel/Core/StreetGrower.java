@@ -2,6 +2,7 @@ package io.levendel.Core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,15 +43,27 @@ public class StreetGrower {
 
     public static class Agent {
         public StreetNode head;
+        public StreetNode prev;
 
-        public Agent(StreetNode head, StreetAttractor af) {
+        public Agent(StreetNode head) {
 
             this.head = head;
+            this.head = prev;
         }
 
-        public StreetNode propose() {
+        public Set<StreetNode> propose() {
+            /*
+            0, 22.5, 45, 67.5, 90, 112.5, 135, ...
+            */
+            Set<StreetNode> proposedNodes = new HashSet<>();
+            double dist = 1.0;
+            for (double t = 0; t <= (Math.PI*2); t += (Math.PI*2)/16) {
+                proposedNodes.add(new StreetNode(dist*Math.cos(t)+this.head.x(), dist*Math.sin(t)+this.head.z()));
+            }
+            return proposedNodes;
+        }
+        public void decide(StreetNode decision) {
 
-            return null;
         }
     }
 }
