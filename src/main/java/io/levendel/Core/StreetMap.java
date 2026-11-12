@@ -16,16 +16,11 @@ public class StreetMap {
             connections.put(curr, Set.of());
     }
 
-    public void addNode(StreetNode curr, StreetNode next) {
-        if (getConnections(curr) == null)
-            connections.put(curr, Set.of(next));
-        else
-            connections.get(curr).add(next);
-
-        if (getConnections(next) == null)
-            connections.put(next, Set.of(curr));
-        else
-            connections.get(next).add(curr);
+     public void connectNodes(StreetNode node1, StreetNode node2) {
+        if (connections.containsKey(node1))
+            connections.get(node1).add(node2);
+        if (connections.containsKey(node2))
+            connections.get(node2).add(node1);
     }
 
     public Set<StreetNode> getNodes() {

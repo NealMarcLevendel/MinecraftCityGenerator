@@ -6,64 +6,102 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import main.java.io.levendel.Core.StreetAttractors.WeightedStreetAttractor;
+
 import java.util.List;
 
 public class StreetGrower {
-    private Elevation ev;
-    private List<StreetAttractor> streetAttractors;
+    private Elevation elevation;
+    private List<WeightedStreetAttractor> weightedStreetAttractors;
+    private List<Proposal> proposals;
     private Agent[] agents;
-    private Map<StreetNode, Set<StreetNode>> streetNodeConnections = new HashMap<>();
+    private StreetMap streetMap;
+    private int seed;
 
-    public StreetGrower(Elevation ev, List<StreetAttractor> streetAttractors, int numAgents) {
-        this.ev = ev;
-        this.streetAttractors = streetAttractors;
+    public StreetGrower(Elevation elevation, List<WeightedStreetAttractor> weightedStreetAttractors, List<Proposal> proposals, 
+        int numAgents, StreepMap streetMap, int seed) {
+        this.elevation = elevation;
+        this.weightedStreetAttractors = weightedStreetAttractors;
+        this.proposals = proposals;
         this.agents = new Agent[numAgents];
+        for (Agent agent : this.agents) {
+            StreetNode start = new StreetNode(this.elevation.getWidth(), this.elevation.getHeight());
+            streetMap.addNode(start);
+
+            agent = new Agent(start, this.streetMap);
+        }
+        this.streetMap = streetMap;
+        this.seed = seed;
     }
 
-    public StreetMap grow() {
-        StreetMap sm = new StreetMap();
-        // logic
-
-        //
-        return sm;
+    public void step() {
+        for (Agent agent : agents) {
+            Set<StreetNode> proposedNodes = agent.propose(proposals);
+            Map<StreetNode, Double> results = evaluate(proposedNodes, agent);
+            agent.decide(decide(results));
+        }
     }
+    private Map<StreetNode, Double> evaluate(Set<StreetNode> proposedNodes, Agent agent) {
+        Map<StreetNode, Double> results = new HashMap<>();
 
-    public void connectNodes(StreetNode node1, StreetNode node2) {
-        if (streetNodeConnections.containsKey(node1))
-            streetNodeConnections.get(node1).add(node2);
-        if (streetNodeConnections.containsKey(node2))
-            streetNodeConnections.get(node2).add(node1);
+        for (StreetNode proposedNode : proposedNodes) {
+            double value = 0.0;
+            for (WeightedStreetAttractor wsa : weightedStreetAttractors) {
+                value += wsa.streetAttractor().evaluate(agent.head, proposedNode, streetMap) * wsa.weight();
+            }
+            value /= weightedStreetAttractors.size();
+            results.put(proposedNode, value);
+        }
+        return results;
     }
+    private StreetNode decide(Map<StreetNode, Double> results) {
+        double max = Double.NEGATIVE_INFINITY;
+        List<StreetNode> maxNodes = new ArrayList<>();
 
-    public Set<StreetNode> getConnections(StreetNode node) {
-        if (!streetNodeConnections.containsKey(node))
-            return null;
-        return streetNodeConnections.get(node);
+        for (Map.Entry<StreetNode, Double> entry : results.entrySet()) {
+            double value = entry.getValue();
+
+            if (value > max) {
+                max = value;
+                maxNodes.clear();
+                maxNodes.add(entry.getKey());
+            } 
+            else if (value == max) {
+                maxNodes.add(entry.getKey());
+            }
+        }
+
+        return maxNodes.get(this.seed % maxNodes.size());
     }
 
     public static class Agent {
         public StreetNode head;
-        public StreetNode prev;
+        public StreetMap streetMap;
 
-        public Agent(StreetNode head) {
+        public Agent(StreetNode head, StreetMap streetMap) {
 
             this.head = head;
-            this.head = prev;
+            this.streetMap = streetMap;
+            streetMap.addNode(head);
         }
 
-        public Set<StreetNode> propose() {
-            /*
-            0, 22.5, 45, 67.5, 90, 112.5, 135, ...
-            */
+        public Set<StreetNode> propose(List<Proposal> proposals) {
             Set<StreetNode> proposedNodes = new HashSet<>();
-            double dist = 1.0;
-            for (double t = 0; t <= (Math.PI*2); t += (Math.PI*2)/16) {
-                proposedNodes.add(new StreetNode(dist*Math.cos(t)+this.head.x(), dist*Math.sin(t)+this.head.z()));
+
+            for (Proposal proposal : proposals) {
+                double newX = head.x() * proposal.distance() * Math.cos(proposal.angle());
+                double newZ = head.x() * proposal.distance() * Math.sin(proposal.angle());
+                proposedNodes.add(new StreetNode(newX, newZ));
             }
             return proposedNodes;
         }
         public void decide(StreetNode decision) {
-
+            streetMap.addNode(decision);
+            streetMap.connectNodes(head, decision);
+            this.head = decision;
         }
+    }
+    public static double random(double min, double max) {
+        return min + Math.random() * (max - min);
     }
 }

@@ -13,4 +13,9 @@ public class SharpAngleCuller implements StreetAttractor {
         this.proposed = proposed;
         this.sm = sm;
     }
+    public double evaluate () {
+        
+
+        return 0.0;
+    }
 }
