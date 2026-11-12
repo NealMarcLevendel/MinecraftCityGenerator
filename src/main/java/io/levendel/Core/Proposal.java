@@ -1,4 +1,4 @@
-package main.java.io.levendel.Core;
+package io.levendel.Core;
 
-record Proposal(double distance, double angle) {
-} 
+public record Proposal(double distance, double angle) {
+}

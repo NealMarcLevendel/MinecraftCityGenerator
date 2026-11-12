@@ -4,34 +4,38 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
-import main.java.io.levendel.Core.StreetAttractors.WeightedStreetAttractor;
+import io.levendel.Core.StreetAttractors.WeightedStreetAttractor;
+import io.levendel.Core.StreetNode;
 
 import java.util.List;
+import java.util.Random;
 
 public class StreetGrower {
-    private Elevation elevation;
-    private List<WeightedStreetAttractor> weightedStreetAttractors;
-    private List<Proposal> proposals;
-    private Agent[] agents;
-    private StreetMap streetMap;
-    private int seed;
+    public Elevation elevation;
+    public List<WeightedStreetAttractor> weightedStreetAttractors;
+    public List<Proposal> proposals;
+    public Agent[] agents;
+    public StreetMap streetMap;
+    public Random rng;
 
     public StreetGrower(Elevation elevation, List<WeightedStreetAttractor> weightedStreetAttractors, List<Proposal> proposals, 
-        int numAgents, StreepMap streetMap, int seed) {
+        int numAgents, StreetMap streetMap, int seed) {
         this.elevation = elevation;
         this.weightedStreetAttractors = weightedStreetAttractors;
         this.proposals = proposals;
         this.agents = new Agent[numAgents];
-        for (Agent agent : this.agents) {
-            StreetNode start = new StreetNode(this.elevation.getWidth(), this.elevation.getHeight());
+        this.streetMap = streetMap;
+        this.rng = new java.util.Random(seed);
+
+        for (int i = 0; i < numAgents; i++) {
+            StreetNode start = new StreetNode(this.elevation.getWidth()/2.0, this.elevation.getHeight()/2.0);
             streetMap.addNode(start);
 
-            agent = new Agent(start, this.streetMap);
+            this.agents[i] = new Agent(start, this.streetMap);
         }
-        this.streetMap = streetMap;
-        this.seed = seed;
     }
 
     public void step() {
@@ -71,7 +75,7 @@ public class StreetGrower {
             }
         }
 
-        return maxNodes.get(this.seed % maxNodes.size());
+        return maxNodes.get(rng.nextInt(maxNodes.size()));
     }
 
     public static class Agent {
@@ -89,8 +93,8 @@ public class StreetGrower {
             Set<StreetNode> proposedNodes = new HashSet<>();
 
             for (Proposal proposal : proposals) {
-                double newX = head.x() * proposal.distance() * Math.cos(proposal.angle());
-                double newZ = head.x() * proposal.distance() * Math.sin(proposal.angle());
+                double newX = head.x() + proposal.distance() * Math.cos(proposal.angle());
+                double newZ = head.z() + proposal.distance() * Math.sin(proposal.angle());
                 proposedNodes.add(new StreetNode(newX, newZ));
             }
             return proposedNodes;

@@ -1,6 +1,7 @@
 package io.levendel.Core;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,7 +14,7 @@ public class StreetMap {
 
     public void addNode(StreetNode curr) {
         if (getConnections(curr) == null)
-            connections.put(curr, Set.of());
+            connections.put(curr, new HashSet<>());
     }
 
      public void connectNodes(StreetNode node1, StreetNode node2) {

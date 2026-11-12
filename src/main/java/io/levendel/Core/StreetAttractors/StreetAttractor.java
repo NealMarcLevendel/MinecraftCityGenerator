@@ -1,4 +1,6 @@
-package io.levendel.Core;
+package io.levendel.Core.StreetAttractors;
+import io.levendel.Core.StreetMap;
+import io.levendel.Core.StreetNode;
 
 public interface StreetAttractor {
 

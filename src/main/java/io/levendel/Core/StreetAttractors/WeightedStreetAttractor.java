@@ -1,5 +1,3 @@
-package main.java.io.levendel.Core.StreetAttractors;
-
-import io.levendel.Core.StreetAttractor;
+package io.levendel.Core.StreetAttractors;
 
 public record WeightedStreetAttractor (StreetAttractor streetAttractor, double weight){}
