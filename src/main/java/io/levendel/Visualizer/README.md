@@ -9,7 +9,7 @@ A standalone desktop tool for watching the city generator's street-growing simul
 ```
 
 Use the **Simulation** dropdown to switch between:
-- **StreetGrower (Core):** the real `io.levendel.Core.StreetGrower`.
+- **StreetGrower (Core):** the real `io.levendel.Core.StreetGrower`, with attractors from `HardcodedWeightedStreetAttractorProvider`.
 - **Sample simulation:** a self-contained reference implementation.
 
 **Controls:**
@@ -40,7 +40,7 @@ Most of the code in this package was written with AI assistance. The rest of the
 | `CityPanel.java` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026. |
 | `StreetSimulation.java` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026. |
 | `StreetGrowerSimulation.java` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026. |
-| `ConstantStreetAttractor.java` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026, at the author's request. |
+| `ConstantStreetAttractor.java` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026, at the author's request. No longer used. |
 | `SampleStreetSimulation.java` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026. It follows the design of the author's `StreetGrower`. |
 | `SampleElevationProvider.java` | Generated with ChatGPT (OpenAI), as noted in the file. |
 | `ElevationPanel.java` | Predates the Claude work. Its authorship is not recorded here. |

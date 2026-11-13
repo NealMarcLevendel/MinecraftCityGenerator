@@ -13,7 +13,8 @@ import io.levendel.Core.Proposal;
 import io.levendel.Core.StreetGrower;
 import io.levendel.Core.StreetMap;
 import io.levendel.Core.StreetNode;
-import io.levendel.Core.StreetAttractors.WeightedStreetAttractor;
+import io.levendel.Core.StreetAttractors.HardcodedWeightedStreetAttractorProvider;
+import io.levendel.Core.StreetAttractors.WeightedStreetAttractorProvider;
 
 /**
  * Adapter that runs the real io.levendel.Core.StreetGrower and exposes its
@@ -33,11 +34,14 @@ public class StreetGrowerSimulation implements StreetSimulation {
     private Map<StreetNode, Set<StreetNode>> previousSnapshot = new LinkedHashMap<>();
     private final List<StreetNode[]> lastStepEdges = new ArrayList<>();
 
+    /** Uses io.levendel.Core.StreetAttractors.HardcodedWeightedStreetAttractorProvider. */
     public StreetGrowerSimulation(Elevation elevation, int numAgents, int seed) {
-        this.elevation = elevation;
+        this(elevation, new HardcodedWeightedStreetAttractorProvider(), numAgents, seed);
+    }
 
-        List<WeightedStreetAttractor> attractors = List.of(
-                new WeightedStreetAttractor(new ConstantStreetAttractor(), 1.0));
+    public StreetGrowerSimulation(Elevation elevation, WeightedStreetAttractorProvider attractorProvider,
+            int numAgents, int seed) {
+        this.elevation = elevation;
 
         List<Proposal> proposals = new ArrayList<>();
         for (int deg = 0; deg < 360; deg += 30) {
@@ -45,7 +49,7 @@ public class StreetGrowerSimulation implements StreetSimulation {
         }
 
         try {
-            grower = new StreetGrower(elevation, attractors, proposals, numAgents, streetMap, seed);
+            grower = new StreetGrower(elevation, attractorProvider, proposals, numAgents, streetMap, seed);
         } catch (Throwable t) {
             lastError = t;
         }
