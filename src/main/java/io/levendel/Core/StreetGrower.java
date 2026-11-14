@@ -55,7 +55,7 @@ public class StreetGrower {
         for (StreetNode proposedNode : proposedNodes) {
             double value = 0.0;
             for (WeightedStreetAttractor wsa : weightedStreetAttractors) {
-                value *= wsa.streetAttractor().evaluate(agent.head, proposedNode, streetMap) * wsa.weight();
+                value += wsa.streetAttractor().evaluate(agent.head, proposedNode, streetMap) * wsa.weight();
             }
             value /= weightedStreetAttractors.size();
             results.put(proposedNode, value);

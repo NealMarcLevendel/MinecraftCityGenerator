@@ -15,7 +15,8 @@ public class HardcodedWeightedStreetAttractorProvider implements WeightedStreetA
                 public double evaluate(StreetNode current, StreetNode proposed, StreetMap streetMap) {
                     return 1.0;
                 }
-            }, 1.0)
+            }, 1.0),
+            new WeightedStreetAttractor(new AngleStreetAttractor(), 1.0)
         );
     }
     
