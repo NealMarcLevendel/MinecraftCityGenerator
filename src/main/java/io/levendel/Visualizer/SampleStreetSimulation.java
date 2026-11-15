@@ -36,10 +36,13 @@ public class SampleStreetSimulation implements StreetSimulation {
     public record SimProposal(double distance, double angleOffset) {
     }
 
-    /** Mirrors io.levendel.Core.StreetAttractor; returns a score in [0, 1], or a negative value to cull. */
+    /**
+     * Mirrors io.levendel.Core.StreetAttractors.StreetAttractor, including the elevation argument;
+     * returns a score in [0, 1], or a negative value to cull.
+     */
     @FunctionalInterface
     public interface SimAttractor {
-        double evaluate(Agent agent, StreetNode proposed, SampleStreetSimulation sim);
+        double evaluate(Agent agent, StreetNode proposed, SampleStreetSimulation sim, Elevation elevation);
     }
 
     /** Mirrors io.levendel.Core.StreetAttractors.WeightedStreetAttractor. */
@@ -108,23 +111,26 @@ public class SampleStreetSimulation implements StreetSimulation {
 
     // ----- attractors -----
 
-    private static double boundsCuller(Agent agent, StreetNode p, SampleStreetSimulation sim) {
+    private static double boundsCuller(Agent agent, StreetNode p, SampleStreetSimulation sim,
+            Elevation elevation) {
         boolean inside = p.x() >= 0 && p.z() >= 0
-                && p.x() <= sim.elevation.getWidth() - 1 && p.z() <= sim.elevation.getHeight() - 1;
+                && p.x() <= elevation.getWidth() - 1 && p.z() <= elevation.getHeight() - 1;
         return inside ? 1.0 : -1.0;
     }
 
     /** Prefers gentle grades (cf. SlopeStreetAttractor). */
-    private static double slopeAttractor(Agent agent, StreetNode p, SampleStreetSimulation sim) {
+    private static double slopeAttractor(Agent agent, StreetNode p, SampleStreetSimulation sim,
+            Elevation elevation) {
         double run = distance(agent.head, p);
         if (run == 0)
             return 0;
-        double rise = Math.abs(sim.heightAt(p) - sim.heightAt(agent.head));
+        double rise = Math.abs(heightAt(elevation, p) - heightAt(elevation, agent.head));
         return Math.max(0, 1 - (rise / run) / sim.maxGrade);
     }
 
     /** Prefers continuing straight; culls sharp turns (cf. SharpAngleCuller). */
-    private static double straightnessAttractor(Agent agent, StreetNode p, SampleStreetSimulation sim) {
+    private static double straightnessAttractor(Agent agent, StreetNode p, SampleStreetSimulation sim,
+            Elevation elevation) {
         double angle = Math.atan2(p.z() - agent.head.z(), p.x() - agent.head.x());
         double turn = Math.abs(normalize(angle - agent.heading));
         if (turn > sim.maxTurn)
@@ -133,7 +139,8 @@ public class SampleStreetSimulation implements StreetSimulation {
     }
 
     /** Keeps streets apart, except where a node is close enough to snap to. */
-    private static double spacingAttractor(Agent agent, StreetNode p, SampleStreetSimulation sim) {
+    private static double spacingAttractor(Agent agent, StreetNode p, SampleStreetSimulation sim,
+            Elevation elevation) {
         double nearest = Double.POSITIVE_INFINITY;
         for (StreetNode n : sim.connections.keySet()) {
             if (n.equals(agent.head))
@@ -189,7 +196,7 @@ public class SampleStreetSimulation implements StreetSimulation {
         candidates: for (StreetNode p : proposed) {
             double value = 0;
             for (WeightedSimAttractor wsa : attractors) {
-                double score = wsa.attractor().evaluate(agent, p, this);
+                double score = wsa.attractor().evaluate(agent, p, this, elevation);
                 if (score < 0)
                     continue candidates; // culled
                 value += score * wsa.weight();
@@ -258,6 +265,14 @@ public class SampleStreetSimulation implements StreetSimulation {
     }
 
     public double heightAt(StreetNode n) {
+        return heightAt(elevation, n);
+    }
+
+    /**
+     * Height at a street node, rounded to the nearest cell and clamped to the terrain,
+     * so it is safe to call on proposals that fall outside the bounds.
+     */
+    public static double heightAt(Elevation elevation, StreetNode n) {
         int x = (int) Math.max(0, Math.min(elevation.getWidth() - 1, Math.round(n.x())));
         int z = (int) Math.max(0, Math.min(elevation.getHeight() - 1, Math.round(n.z())));
         return elevation.get(x, z);

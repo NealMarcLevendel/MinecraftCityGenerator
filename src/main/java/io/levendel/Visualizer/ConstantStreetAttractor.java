@@ -1,5 +1,6 @@
 package io.levendel.Visualizer;
 
+import io.levendel.Core.Elevation;
 import io.levendel.Core.StreetMap;
 import io.levendel.Core.StreetNode;
 import io.levendel.Core.StreetAttractors.StreetAttractor;
@@ -21,7 +22,7 @@ public class ConstantStreetAttractor implements StreetAttractor {
     }
 
     @Override
-    public double evaluate(StreetNode current, StreetNode proposed, StreetMap streetMap) {
+    public double evaluate(StreetNode current, StreetNode proposed, StreetMap streetMap, Elevation elevation) {
         return value;
     }
 }

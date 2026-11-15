@@ -9,7 +9,7 @@ A standalone desktop tool for watching the city generator's street-growing simul
 ```
 
 Use the **Simulation** dropdown to switch between:
-- **StreetGrower (Core):** the real `io.levendel.Core.StreetGrower`, with attractors from `HardcodedWeightedStreetAttractorProvider`.
+- **StreetGrower (Core):** the real `io.levendel.Core.StreetGrower`, with attractors from `HardcodedWeightedStreetAttractorProvider` and cullers from `HardcodedStreetCullerProvider`.
 - **Sample simulation:** a self-contained reference implementation.
 
 **Controls:**
@@ -39,9 +39,9 @@ Most of the code in this package was written with AI assistance. The rest of the
 | `CityVisualizer.java` | Rewritten by Claude (Anthropic, Claude Opus 5.5), Nov 2026. It replaced a smaller human-written version that opened a window showing only the terrain. |
 | `CityPanel.java` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026. |
 | `StreetSimulation.java` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026. |
-| `StreetGrowerSimulation.java` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026. |
-| `ConstantStreetAttractor.java` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026, at the author's request. No longer used. |
-| `SampleStreetSimulation.java` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026. It follows the design of the author's `StreetGrower`. |
+| `StreetGrowerSimulation.java` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026; updated 2026-11-14 to pass a `StreetCullerProvider`. |
+| `ConstantStreetAttractor.java` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026, at the author's request; updated for the elevation argument on 2026-11-14. No longer used. |
+| `SampleStreetSimulation.java` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026. It follows the design of the author's `StreetGrower`; its attractors were given an elevation argument on 2026-11-14 to mirror Core. |
 | `SampleElevationProvider.java` | Generated with ChatGPT (OpenAI), as noted in the file. |
 | `ElevationPanel.java` | Predates the Claude work. Its authorship is not recorded here. |
 | `CLAUDE.md`, `README.md` | Written by Claude (Anthropic, Claude Opus 5.5), Nov 2026. |

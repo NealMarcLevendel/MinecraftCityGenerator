@@ -9,6 +9,8 @@ import java.util.Set;
 
 import io.levendel.Core.StreetAttractors.WeightedStreetAttractor;
 import io.levendel.Core.StreetAttractors.WeightedStreetAttractorProvider;
+import io.levendel.Core.StreetCullers.StreetCuller;
+import io.levendel.Core.StreetCullers.StreetCullerProvider;
 import io.levendel.Core.StreetNode;
 
 import java.util.List;
@@ -17,22 +19,28 @@ import java.util.Random;
 public class StreetGrower {
     public Elevation elevation;
     public List<WeightedStreetAttractor> weightedStreetAttractors;
+    public List<StreetCuller> streetCullers;
     public List<Proposal> proposals;
     public Agent[] agents;
     public StreetMap streetMap;
     public Random rng;
 
-    public StreetGrower(Elevation elevation, WeightedStreetAttractorProvider weightedStreetAttractorProvider, List<Proposal> proposals, 
-        int numAgents, StreetMap streetMap, int seed) {
+    public StreetGrower(Elevation elevation, WeightedStreetAttractorProvider weightedStreetAttractorProvider,
+            StreetCullerProvider streetCullerProvider,
+            List<Proposal> proposals,
+            int numAgents, StreetMap streetMap, int seed) {
         this.elevation = elevation;
+
         this.weightedStreetAttractors = weightedStreetAttractorProvider.provide();
+        this.streetCullers = streetCullerProvider.provide();
+
         this.proposals = proposals;
         this.agents = new Agent[numAgents];
         this.streetMap = streetMap;
         this.rng = new java.util.Random(seed);
 
         for (int i = 0; i < numAgents; i++) {
-            StreetNode start = new StreetNode(this.elevation.getWidth()/2.0, this.elevation.getHeight()/2.0);
+            StreetNode start = new StreetNode(this.elevation.getWidth() / 2.0, this.elevation.getHeight() / 2.0);
             streetMap.addNode(start);
 
             this.agents[i] = new Agent(start, this.streetMap);
@@ -43,25 +51,27 @@ public class StreetGrower {
         for (Agent agent : agents) {
             Set<StreetNode> proposedNodes = agent.propose(proposals);
 
-            cullProposedNodes(agent.head, proposedNodes);
+            cull(agent.head, proposedNodes);
 
-            Map<StreetNode, Double> results = evaluate(proposedNodes, agent);
+            Map<StreetNode, Double> results = evaluate(agent.head, proposedNodes);
             agent.decide(decide(results));
         }
     }
-    private Map<StreetNode, Double> evaluate(Set<StreetNode> proposedNodes, Agent agent) {
+
+    private Map<StreetNode, Double> evaluate(StreetNode head, Set<StreetNode> proposedNodes) {
         Map<StreetNode, Double> results = new HashMap<>();
 
         for (StreetNode proposedNode : proposedNodes) {
             double value = 0.0;
             for (WeightedStreetAttractor wsa : weightedStreetAttractors) {
-                value += wsa.streetAttractor().evaluate(agent.head, proposedNode, streetMap) * wsa.weight();
+                value += wsa.streetAttractor().evaluate(head, proposedNode, streetMap, elevation) * wsa.weight();
             }
             value /= weightedStreetAttractors.size();
             results.put(proposedNode, value);
         }
         return results;
     }
+
     private StreetNode decide(Map<StreetNode, Double> results) {
         double max = Double.NEGATIVE_INFINITY;
         List<StreetNode> maxNodes = new ArrayList<>();
@@ -73,8 +83,7 @@ public class StreetGrower {
                 max = value;
                 maxNodes.clear();
                 maxNodes.add(entry.getKey());
-            } 
-            else if (value == max) {
+            } else if (value == max) {
                 maxNodes.add(entry.getKey());
             }
         }
@@ -103,20 +112,21 @@ public class StreetGrower {
             }
             return proposedNodes;
         }
+
         public void decide(StreetNode decision) {
             streetMap.addNode(decision);
             streetMap.connectNodes(head, decision);
             this.head = decision;
         }
     }
-    public void cullProposedNodes(StreetNode head, Set<StreetNode> proposedNodes) {
-        proposedNodes.removeIf(n ->
-                n.x() < 0 || n.x() > elevation.getWidth() - 1 ||
-                n.z() < 0 || n.z() > elevation.getHeight() - 1);
 
-        proposedNodes.removeIf(n ->
-        n.x() == head.x() && n.z() == head.z());
+    public void cull(StreetNode head, Set<StreetNode> proposedNodes) {
+        for (StreetCuller streetCuller : streetCullers) {
+            proposedNodes.removeIf(n -> streetCuller.evaluate(head, n, streetMap, elevation));
+        }
+
     }
+
     public static double random(double min, double max) {
         return min + Math.random() * (max - min);
     }
